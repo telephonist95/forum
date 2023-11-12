@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}
+Sign Up
+{% endblock %}
+
+{% block headers %}
+<h1>Sign Up</h1>
+{% endblock %}
+
+{% block content %}
+<form>
+  <div class="form-group row mt-3">
+    <label for="inputLogin" class="col-sm-2 col-form-label">Login</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputLogin" placeholder="Input your login here">
+    </div>
+  </div>
+
+  <div class="form-group row mt-3">
+    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" id="inputEmail" placeholder="Input your email here">
+    </div>
+  </div>
+
+  <div class="form-group row mt-3">
+    <label for="inputNick" class="col-sm-2 col-form-label">NickName</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputNick" placeholder="Input your nickname here">
+    </div>
+  </div>
+
+  <div class="form-group row mt-3">
+    <label class="col-form-label col-sm-2" for="inputPassword">Password</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" id="inputPassword" placeholder="Input your password here">
+    </div>
+  </div>
+
+  <div class="form-group row mt-3">
+    <label class="col-form-label col-sm-2" for="inputPassword1">Repeat password</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" id="inputPassword1" placeholder="Input your password here">
+    </div>
+  </div>
+
+  <div class="form-group row mt-3">
+    <label for="inputFile" class="col-sm-2 col-form-label">Upload avatar</label>
+    <div class="col-sm-10">
+      <input type="file" class="form-control" id="inputFile">
+    </div>
+  </div>
+
+  <div class="form-group row mt-3">
+    <div class="col-sm-10">
+      <button type="submit" class="btn btn-success">Sign up!</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,48 @@
+<ul class="pagination mt-3">
+  <li class="page-item">
+    <a class="page-link" href="?page=1" aria-label="First">
+      <spann aria-hidden="true">&laquo;</span>
+</a>
+</li>
+{% if page.has_previous %}
+<li class="page-item">
+  <a class="page-link" href="?page={{ page.previous_page_number }}" aria-label="Previous">
+    <span aria-hidden="true">&lt;</span>
+  </a>
+</li>
+{% else %}
+<li class="page-item">
+  <a class="page-link disabled" href="#" aria-label="Previous">
+    <span aria-hidden="true">&lt;</span>
+  </a>
+</li>
+{% endif %}
+
+<li class="page-item active"><a class="page-link" href="?page={{ page.number }}">{{ page.number }}</a></li>
+{% if page.has_next %}
+<li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}">{{ page.next_page_number }}</a></li>
+{% endif %}
+{% if page.number|add:1 < page.paginator.num_pages %}
+<li class="page-item"><a class="page-link" href="?page={{ page.number|add:2 }}">{{ page.number|add:2 }}</a></li>
+{% endif %}
+
+{% if page.has_next %}
+<li class="page-item">
+  <a class="page-link" href="?page={{ page.next_page_number }}" aria-label="Next">
+    <span aria-hidden="true">&gt;</span>
+  </a>
+</li>
+{% else %}
+<li class="page-item">
+  <a class="page-link disabled" href="#" aria-label="Next">
+    <span aria-hidden="true">&gt;</span>
+  </a>
+</li>
+{% endif %}
+
+<li class="page-item">
+  <a class="page-link" href="?page={{ page.paginator.num_pages }}" aria-label="Last">
+    <spann aria-hidden="true">&raquo;</span>
+</a>
+</li>
+</ul>

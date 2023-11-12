@@ -1,0 +1,21 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}
+Hot
+{% endblock %}
+
+{% block headers %}
+<h1>Hot Questions</h1>
+{% endblock %}
+
+{% block content %}
+
+{% for question in page %}
+{% include 'components/question-item.html' %}
+{% endfor %}
+
+{% include 'components/paginator.html' %}
+
+{% endblock %}
+

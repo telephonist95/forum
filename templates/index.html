@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}
+Index
+{% endblock %}
+
+{% block headers %}
+<h1>New Questions</h1>
+<a href="{% url 'hot' %}">Hot Questions</a>
+{% endblock %}
+
+{% block content %}
+
+{% for question in page %}
+{% include 'components/question-item.html' %}
+{% endfor %}
+
+{% include 'components/paginator.html' %}
+
+{% endblock %}
+
