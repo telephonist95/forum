@@ -2,10 +2,6 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from .models import *
 
-# FIXME
-from django.db.models import Sum
-from django.db.models import Case, When
-
 
 def paginate(objects, request, per_page=20):
     paginator = Paginator(objects, per_page)
@@ -13,12 +9,12 @@ def paginate(objects, request, per_page=20):
 
 
 def index(request):
-    questions = Question.objects.annotate(rating=Sum(Case(When(reactions__positive=True, then=1), When(reactions__positive=False, then=-1)))).order_by('created')
+    questions = Question.objects.with_rating().order_by('created')
     return render(request, 'index.html', {'page': paginate(questions, request)})
 
 
 def hot(request):
-    questions = Question.objects.annotate(rating=Sum(Case(When(reactions__positive=True, then=1), When(reactions__positive=False, then=-1)))).order_by('-rating')
+    questions = Question.objects.with_rating().order_by('-rating')
     return render(request, 'index.html', {'page': paginate(questions, request)})
 
 
@@ -31,8 +27,8 @@ def login(request):
 
 
 def question(request, question_id):
-    question = Question.objects.annotate(rating=Sum(Case(When(reactions__positive=True, then=1), When(reactions__positive=False, then=-1)))).get(id=question_id)
-    answers = Answer.objects.order_by('created').annotate(rating=Sum(Case(When(reactions__positive=True, then=1), When(reactions__positive=False, then=-1)))).filter(question=question)
+    question = Question.objects.with_rating().get(id=question_id)
+    answers = Answer.objects.with_rating().filter(question=question).order_by('created')
     return render(request, 'question.html', {'page': paginate(answers, request), 'question': question})
 
 
@@ -45,5 +41,5 @@ def signup(request):
 
 
 def tag(request, tag_name):
-    questions = Question.objects.annotate(rating=Sum(Case(When(reactions__positive=True, then=1), When(reactions__positive=False, then=-1)))).filter(tags__name=tag_name)
+    questions = Question.objects.with_rating().filter(tags__name=tag_name)
     return render(request, 'tag.html', {'page': paginate(questions, request), 'tag': tag_name})
