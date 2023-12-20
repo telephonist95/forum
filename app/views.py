@@ -1,20 +1,23 @@
 from django.shortcuts import render
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from .models import *
 
 
 def paginate(objects, request, per_page=20):
     paginator = Paginator(objects, per_page)
-    return paginator.page(request.GET.get('page', 1))
+    try:
+        return paginator.page(request.GET.get('page', 1))
+    except EmptyPage:
+        return paginator.page(1)
 
 
 def index(request):
-    questions = Question.objects.with_rating().order_by('created')
+    questions = Question.objects.newest()
     return render(request, 'index.html', {'page': paginate(questions, request)})
 
 
 def hot(request):
-    questions = Question.objects.with_rating().order_by('-rating')
+    questions = Question.objects.hot()
     return render(request, 'index.html', {'page': paginate(questions, request)})
 
 
@@ -27,8 +30,8 @@ def login(request):
 
 
 def question(request, question_id):
-    question = Question.objects.with_rating().get(id=question_id)
-    answers = Answer.objects.with_rating().filter(question=question).order_by('created')
+    question = Question.objects.by_id(question_id)
+    answers = Answer.objects.to_question(question)
     return render(request, 'question.html', {'page': paginate(answers, request), 'question': question})
 
 
@@ -41,5 +44,5 @@ def signup(request):
 
 
 def tag(request, tag_name):
-    questions = Question.objects.with_rating().filter(tags__name=tag_name)
+    questions = Question.objects.by_tag(tag_name)
     return render(request, 'tag.html', {'page': paginate(questions, request), 'tag': tag_name})

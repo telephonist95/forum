@@ -43,16 +43,6 @@ class Command(BaseCommand):
         Tag.objects.bulk_create(tags)
         self.stdout.write("Tags are successfully generated")
 
-        # Reactions generation
-        reactions = [
-            Reaction(user=users[i//200],
-                     positive=fake.pybool())
-            for i in range(num*200)
-        ]
-        Reaction.objects.bulk_create(reactions)
-        random.shuffle(reactions)
-        self.stdout.write("Reactions are successfully generated")
-
         # Questions generation
         questions = [
             Question(user=users[i//10],
@@ -65,8 +55,6 @@ class Command(BaseCommand):
         # Initializing of ManyToMany fields
         for question in questions:
             question.tags.set(fake.random_sample(tags, fake.random_int(3, 7)))
-            question.reactions.set(reactions[:5])
-            del reactions[:5]
         self.stdout.write("Questions are successfully generated")
 
         # Answers generation
@@ -78,11 +66,31 @@ class Command(BaseCommand):
             for i in range(num*100)
         ]
         Answer.objects.bulk_create(answers)
-        answers = Answer.objects.all()
-        # Initializing of ManyToMany fields
-        for answer in answers:
-            if len(reactions):
-                count = fake.random_int(1, 2)
-                answer.reactions.set(reactions[:count])
-                del reactions[:count]
         self.stdout.write("Answers are successfully generated")
+
+        # Question reactions generation
+        question_reactions = [
+            QuestionReaction(user=users[i//20],
+                             positive=fake.pybool())
+            for i in range(num*20)
+        ]
+        for i in range(num):
+            user_questions = fake.random_sample(questions, 20)
+            for j in range(20):
+                question_reactions[i*20 + j].question = user_questions[j]
+        QuestionReaction.objects.bulk_create(question_reactions)
+        self.stdout.write("Question reactions are successfully generated")
+
+        # Answer reactions generation
+        answer_reactions = [
+            AnswerReaction(user=users[i//180],
+                           positive=fake.pybool())
+            for i in range(num*180)
+        ]
+        for i in range(num):
+            user_answers = fake.random_sample(answers, 180)
+            for j in range(180):
+                answer_reactions[i*180 + j].answer = user_answers[j]
+        AnswerReaction.objects.bulk_create(answer_reactions)
+        self.stdout.write("Answer reactions are successfully generated")
+
