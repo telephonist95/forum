@@ -1,5 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% load django_bootstrap5 %}
 
 {% block title %}
 Settings
@@ -10,40 +11,12 @@ Settings
 {% endblock %}
 
 {% block content %}
-<form>
-  <div class="form-group row mt-3">
-    <label for="inputLogin" class="col-sm-2 col-form-label">Login</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="inputLogin" placeholder="Input your login here">
-    </div>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <div style="width: 150px">
+    <img src="{{ request.user.profile.avatar.url }}" alt="avatar" class="w-100">
   </div>
-
-  <div class="form-group row mt-3">
-    <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
-    <div class="col-sm-10">
-      <input type="email" class="form-control" id="inputEmail" placeholder="Input your email here">
-    </div>
-  </div>
-
-  <div class="form-group row mt-3">
-    <label for="inputNick" class="col-sm-2 col-form-label">NickName</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="inputNick" placeholder="Input your nickname here">
-    </div>
-  </div>
-
-  <div class="form-group row mt-3">
-    <label for="inputFile" class="col-sm-2 col-form-label">Upload avatar</label>
-    <img src="{% static 'img/avatar.png' %}" class="w-auto"  width="100" height="100" alt="Avatar">
-    <div class="col-sm-10 mt-3">
-      <input type="file" class="form-control" id="inputFile">
-    </div>
-  </div>
-
-  <div class="form-group row mt-3">
-    <div class="col-sm-10">
-      <button type="submit" class="btn btn-success">Save!</button>
-    </div>
-  </div>
+  {% bootstrap_button button_type='submit' content='Save!' %}
 </form>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.db import models
-from django.conf import settings
+from django.contrib.auth.models import User
 from django.db.models import Sum, Case, When
 
 
@@ -30,9 +30,37 @@ class AnswerManager(models.Manager):
         return self.with_rating().filter(question=question).order_by('created')
 
 
+class QuestionReactionManager(models.Manager):
+    def like(self, user, question):
+        if self.filter(user=user, question=question).exists():
+            self.filter(user=user, question=question).delete()
+        else:
+            self.create(user=user, question=question, positive=True)
+
+    def dislike(self, user, question):
+        if self.filter(user=user, question=question).exists():
+            self.filter(user=user, question=question).delete()
+        else:
+            self.create(user=user, question=question, positive=False)
+
+
+class AnswerReactionManager(models.Manager):
+    def like(self, user, answer):
+        if self.filter(user=user, answer=answer).exists():
+            self.filter(user=user, answer=answer).delete()
+        else:
+            self.create(user=user, answer=answer, positive=True)
+
+    def dislike(self, user, answer):
+        if self.filter(user=user, answer=answer).exists():
+            self.filter(user=user, answer=answer).delete()
+        else:
+            self.create(user=user, answer=answer, positive=False)
+
+
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    avatar = models.ImageField()
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(null=True, blank=True, default='avatar.png', upload_to='avatar/%Y/%m/%d')
 
 
 class Tag(models.Model):
@@ -40,7 +68,7 @@ class Tag(models.Model):
 
 
 class Question(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=32)
     text = models.TextField()
@@ -50,7 +78,7 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     text = models.TextField()
@@ -61,11 +89,11 @@ class Answer(models.Model):
 
 class QuestionReaction(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     positive = models.BooleanField()
 
 
 class AnswerReaction(models.Model):
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     positive = models.BooleanField()

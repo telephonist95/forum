@@ -24,6 +24,8 @@
 	</form>
 	<a href="{% url 'ask' %}" class="btn btn-success me-3" role="button">ASK!</a>
 	<a href="{% url 'login' %}" class="btn btn-light me-3" role="button">Log in</a>
+	<a href="{% url 'logout' %}" class="btn btn-light me-3" role="button">Log out</a>
+	<a href="{% url 'settings' %}" class="btn btn-light me-3" role="button">Settings</a>
 	<a href="{% url 'signup' %}" class="btn btn-primary me-3" role="button">Sign up</a>
       </div>
     </nav>
@@ -95,6 +97,7 @@
     </footer>
 
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
 
   </body>
 </html>
