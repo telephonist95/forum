@@ -22,7 +22,6 @@ class SignupForm(forms.ModelForm):
         self.cleaned_data.pop('password_check')
         user = User.objects.create_user(**self.cleaned_data)
         profile = Profile.objects.create(user=user)
-        profile.save()
         return user
 
 
@@ -48,15 +47,30 @@ class CustomizeForm(forms.ModelForm):
         fields = ['username', 'email']
 
 
-class AskForm(forms.Form):
-    title = forms.CharField(label='Title')
+class AskForm(forms.ModelForm):
     text = forms.CharField(label='Text', widget=forms.Textarea)
     tags = forms.CharField(label='Tags')
 
-    def save(self, **kwargs):
-        print(kwargs)
-        # return Question.objects.create_question(**self.cleaned_data)
+    def save(self, user, **kwargs):
+        article = Article.objects.create(text=self.cleaned_data.get('text'), user=user)
+        question = Question.objects.create(article=article, title=self.cleaned_data.get('title'))
+        for tag_name in self.cleaned_data.get('tags').split():
+            if Tag.objects.filter(name=tag_name).exists():
+                question.tags.add(Tag.objects.get(name=tag_name))
+            else:
+                new_tag = Tag.objects.create(name=tag_name)
+                question.tags.add(new_tag)
+        return question
+
+    class Meta:
+        model = Question
+        fields = ['title']
 
 
 class AnswerForm(forms.Form):
     text = forms.CharField(label='Text', widget=forms.Textarea)
+
+    def save(self, user, question, **kwargs):
+        article = Article.objects.create(text=self.cleaned_data.get('text'), user=user)
+        answer = Answer.objects.create(article=article, question=question, correct=False)
+        return answer

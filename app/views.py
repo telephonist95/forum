@@ -18,12 +18,16 @@ def paginate(objects, request, per_page=20):
 
 def index(request):
     questions = Question.objects.newest()
-    return render(request, 'index.html', {'page': paginate(questions, request)})
+    popular_tags = Tag.objects.most_popular(5)
+    popular_users = Profile.objects.most_popular(5)
+    return render(request, 'index.html', {'page': paginate(questions, request),
+                                          'popular_users': popular_users,
+                                          'popular_tags': popular_tags})
 
 
 def hot(request):
     questions = Question.objects.hot()
-    return render(request, 'index.html', {'page': paginate(questions, request)})
+    return render(request, 'hot.html', {'page': paginate(questions, request)})
 
 
 def ask(request):
@@ -31,8 +35,7 @@ def ask(request):
     if request.method == 'POST':
         ask_form = AskForm(request.POST)
         if ask_form.is_valid():
-            print(request.user)
-            ask_form.save()
+            ask_form.save(request.user)
     return render(request, 'ask.html', {'form': ask_form})
 
 
@@ -73,6 +76,11 @@ def question(request, question_id):
     answers = Answer.objects.to_question(question)
 
     answer_form = AnswerForm()
+    if request.method == 'POST':
+        answer_form = AnswerForm(request.POST)
+        if answer_form.is_valid():
+            answer_form.save(request.user, question)
+
     return render(request, 'question.html',
                   {'page': paginate(answers, request), 'question': question, 'form': answer_form})
 
@@ -100,7 +108,7 @@ def question_react(request):
     if reaction_type == 'like':
         QuestionReaction.objects.like(user=request.user, question=question)
     else:
-        QuestionReaction.objects.deslike(user=request.user, question=question)
+        QuestionReaction.objects.dislike(user=request.user, question=question)
 
     return JsonResponse({})
     

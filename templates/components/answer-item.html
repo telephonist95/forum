@@ -1,0 +1,22 @@
+{% load static %}
+<div class="card mb-3">
+  <div class="row g-0 m-2">
+    <div class="col-md-2">
+      <img src="{{ answer.article.user.profile.avatar.url }}" class="rounded-circle img-fluid" alt="avatar">
+      <p class="text-center">{{ answer.article.user.username }}</p>
+      <div class="form rating-section btn-group ms-2">
+	<button type="button" class="btn btn-outline-primary">↑</button>
+	<span class="btn btn-outline-primary disabled">{{ answer.rating }}</span>
+	<button type="button" class="btn btn-outline-primary">↓</button>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card-body">
+        <p class="card-text">
+	  {{ answer.article.text }}
+	</p>
+        <p class="card-text"><small class="text-body-secondary">{{ answer.article.created }}</small></p>
+      </div>
+    </div>
+  </div>
+</div>

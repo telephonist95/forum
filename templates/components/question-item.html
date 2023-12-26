@@ -1,20 +1,26 @@
 {% load static %}
-<div class="row border border-3 border-dark rounded mt-3 mx-auto p-3">
-  <div class="col-3">
-    <img src="{% static 'img/avatar.png' %}" width="100" height="100" alt="Avatar">
-    <div class="form mt-3 w-50 rating-section btn-group">
-      <button type="button" class="btn btn-outline-secondary">👍</button>
-      <span class="btn btn-outline-secondary disabled">{{ question.rating }}</span>
-      <button type="button" class="btn btn-outline-secondary">👎</button>
+<div class="card mb-3 border-primary">
+  <div class="row g-0 m-2">
+    <div class="col-md-2">
+      <img src="{{ question.article.user.profile.avatar.url }}" class="rounded-circle img-fluid" alt="avatar">
+      <p class="text-center">{{ question.article.user.username }}</p>
+      <div class="form rating-section btn-group ms-2">
+	<button type="button" class="btn btn-outline-primary">↑</button>
+	<span class="btn btn-outline-primary disabled">{{ question.rating }}</span>
+	<button type="button" class="btn btn-outline-primary">↓</button>
+      </div>
     </div>
-  </div>
-  <div class="col-9">
-    <a href="{% url 'question' question.id %}" class="h3">{{ question.title }}</a>
-    <p class="mt-2">{{ question.text }}</p>
-    <button type="button" class="btn btn-success me-3">Answer</button>
-    <span class="badge text-bg-primary fs-6">Tags: </span>
-    {% for tag in question.tags.all %}
-    <a href="{% url 'tag' tag.name %}">{{ tag.name }}</a>
-    {% endfor %}
+    <div class="col">
+      <div class="card-body">
+        <h3 class="card-title"><a href="{% url 'question' question.id %}">{{ question.title }}</a></h3>
+        <p class="card-text">
+	  {{ question.article.text }}
+	</p>
+	{% for tag in question.tags.all %}
+	<a class="btn btn-sm btn-outline-info" href="{% url 'tag' tag.name %}">{{ tag.name }}</a>
+	{% endfor %} <br>
+        <p class="card-text"><small class="text-body-secondary">{{ question.article.created }}</small></p>
+      </div>
+    </div>
   </div>
 </div>

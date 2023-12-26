@@ -1,18 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models import Sum, Case, When
+from django.db.models import Sum, Case, When, Count
 
 
 class QuestionManager(models.Manager):
     def with_rating(self):
-        return self.annotate(rating=Sum(Case(When(questionreaction__positive=True, then=1),
-                                             When(questionreaction__positive=False, then=-1)), default=0))
+        return self.annotate(rating=Sum(Case(When(article__reaction__positive=True, then=1),
+                                             When(article__reaction__positive=False, then=-1)), default=0))
 
     def hot(self):
         return self.with_rating().order_by('-rating')
 
     def newest(self):
-        return self.with_rating().order_by('created')
+        return self.with_rating().order_by('-article__created')
 
     def by_id(self, question_id):
         return self.with_rating().get(id=question_id)
@@ -23,77 +23,67 @@ class QuestionManager(models.Manager):
 
 class AnswerManager(models.Manager):
     def with_rating(self):
-        return self.annotate(rating=Sum(Case(When(answerreaction__positive=True, then=1),
-                                             When(answerreaction__positive=False, then=-1)), default=0))
+        return self.annotate(rating=Sum(Case(When(article__reaction__positive=True, then=1),
+                                             When(article__reaction__positive=False, then=-1)), default=0))
 
     def to_question(self, question):
-        return self.with_rating().filter(question=question).order_by('created')
+        return self.with_rating().filter(question=question).order_by('article__created')
 
 
-class QuestionReactionManager(models.Manager):
-    def like(self, user, question):
-        if self.filter(user=user, question=question).exists():
-            self.filter(user=user, question=question).delete()
-        else:
-            self.create(user=user, question=question, positive=True)
-
-    def dislike(self, user, question):
-        if self.filter(user=user, question=question).exists():
-            self.filter(user=user, question=question).delete()
-        else:
-            self.create(user=user, question=question, positive=False)
+class TagManager(models.Manager):
+    def most_popular(self, count):
+        return self.annotate(num_tags=Count("question__tags")).order_by("-num_tags")[:count]
 
 
-class AnswerReactionManager(models.Manager):
-    def like(self, user, answer):
-        if self.filter(user=user, answer=answer).exists():
-            self.filter(user=user, answer=answer).delete()
-        else:
-            self.create(user=user, answer=answer, positive=True)
+class ProfileManager(models.Manager):
+    def with_rating(self):
+        return self.annotate(rating=Sum(Case(When(user__article__reaction__positive=True, then=1),
+                                             When(user__article__reaction__positive=False, then=-1)), default=0))
 
-    def dislike(self, user, answer):
-        if self.filter(user=user, answer=answer).exists():
-            self.filter(user=user, answer=answer).delete()
-        else:
-            self.create(user=user, answer=answer, positive=False)
+    def most_popular(self, count):
+        return self.with_rating().order_by('-rating')[:count]
+
+
+class ReactionManager(models.Manager):
+    pass
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(null=True, blank=True, default='avatar.png', upload_to='avatar/%Y/%m/%d')
 
+    objects = ProfileManager()
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=16)
 
+    objects = TagManager()
 
-class Question(models.Model):
+
+class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=32)
     text = models.TextField()
+
+
+class Question(models.Model):
+    article = models.OneToOneField(Article, on_delete=models.CASCADE)
+    title = models.CharField(max_length=32)
     tags = models.ManyToManyField(Tag)
 
     objects = QuestionManager()
 
 
 class Answer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
+    article = models.OneToOneField(Article, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    text = models.TextField()
     correct = models.BooleanField()
 
     objects = AnswerManager()
 
 
-class QuestionReaction(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    positive = models.BooleanField()
-
-
-class AnswerReaction(models.Model):
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
+class Reaction(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     positive = models.BooleanField()

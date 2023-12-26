@@ -7,14 +7,14 @@ Settings
 {% endblock %}
 
 {% block headers %}
-<h1>Settings</h1>
+<h1 class="mb-5">Settings</h1>
 {% endblock %}
 
 {% block content %}
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
   {% bootstrap_form form %}
-  <div style="width: 150px">
+  <div class="mb-3" style="width: 150px">
     <img src="{{ request.user.profile.avatar.url }}" alt="avatar" class="w-100">
   </div>
   {% bootstrap_button button_type='submit' content='Save!' %}
